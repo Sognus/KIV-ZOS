@@ -4,32 +4,20 @@
 #include <mem.h>
 #include <string.h>
 
-#include "bool.h"
-#include "boot_record.h"
-
-
-const int32_t UID_ITEM_FREE = 0;
-const int32_t MFT_FRAGMENTS_COUNT = 32;
-
-
+#include "structure.h"
+#include "ntfs.h"
 
 int main(int argc, char *argv[]) {
+    if(argc < 2)
+    {
+        printf("ERROR: Program was started without arguments!");
+        return -1;
+    }
+
     printf("NTFS START!\n");
 
-    struct boot_record *boot = malloc(sizeof(struct boot_record));
+    create_file(argv[1], MAX_CLUSTER_COUNT, MAX_CLUSTER_SIZE);
 
-    printf("BOOT RECORD CREATED\n");
-
-    strncpy(boot->signature, "test", sizeof("test"));
-
-    printf("BOOT SIGNATURE: %s\n", boot->signature);
-
-    bool test = true;
-
-    printf("Bool: %d\n", test);
-
-
-    free(boot);
     printf("NTFS END!\n");
     return 0;
 }

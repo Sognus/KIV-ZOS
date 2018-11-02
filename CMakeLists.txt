@@ -1,6 +1,13 @@
 cmake_minimum_required(VERSION 3.12)
-project(KIV_ZOS C)
+project(KIV_ZOS)
 
-set(CMAKE_C_STANDARD 99)
+set(CMAKE_CXX_STANDARD 14)
 
-add_executable(KIV_ZOS main.c structure.c ntfs.c ntfs.h)
+include_directories(.)
+
+add_executable(KIV_ZOS
+        main.c
+        ntfs.c
+        ntfs.h
+        structure.c
+        structure.h)

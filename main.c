@@ -18,6 +18,10 @@ int main(int argc, char *argv[]) {
 
     create_file(argv[1], MAX_CLUSTER_COUNT, MAX_CLUSTER_SIZE);
 
+    boot_record *record = create_standard_boot_record();
+    print_boot_record(record);
+
+
     printf("NTFS END!\n");
     return 0;
 }

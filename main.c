@@ -21,6 +21,10 @@ int main(int argc, char *argv[]) {
 
 
 
+    boot_record *record = create_standard_boot_record();
+    print_boot_record(record);
+
+
     printf("NTFS END!\n");
     return 0;
 }

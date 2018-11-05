@@ -6,6 +6,48 @@
 #include <math.h>
 #include "structure.h"
 
+
+/**
+ * Na zaklade vstupnich hodnot prepocita hodnoty v boot zaznamu a zmeni je
+ *
+ * @param record zaznam ke zmeneni
+ * @param cluster_count novy pocet clusteru
+ * @param cluster_size velikost jednoho clusteru
+ */
+void boot_record_resize(boot_record *record, int32_t cluster_count, int32_t cluster_size)
+{
+    /* VYPOCET VELIKOSTI JEDNOTLIVYCH CASTI NTFS */
+
+    // Velikost datove casti: pocet clusteru * velikost clusteru v B
+    int32_t data_size = cluster_count * cluster_size;
+    // Velikost bitmapy: pocet clusteru * velikost bool
+    int32_t bitmap_size = cluster_count * sizeof(int);
+    // MFT = 10% datoveho bloku
+    int32_t mft_size = (int32_t)(ceil(0.1 * data_size));
+    // boot_record size
+    int32_t boot_record_size = sizeof(boot_record);
+
+    int32_t ntfs_size = data_size + bitmap_size + mft_size + boot_record_size;
+
+    /* ------------------------------------------- */
+    /* VYPOCET POCATECNICH ADRES JEDNOTLIVYCH CASTI NTFS  */
+    int32_t mft_start = boot_record_size;
+    int32_t bitmap_start = boot_record_size + mft_size;
+    int32_t data_start = boot_record_size + mft_size + bitmap_size;
+
+    /* -------------------------------------------- */
+    /* UPRAVA BOOT RECORDU */
+    record->cluster_count = cluster_count;
+    record->cluster_size = cluster_size;
+    record->data_start_address = data_start;
+    record->bitmap_start_address = bitmap_start;
+    record->mft_start_address = mft_start;
+    // NOTE: Disk size je hodnota bez alignment bytes je nutno ji pripocitat
+    record->disk_size = ntfs_size;
+
+
+}
+
 /**
  * Na zaklade vstupnich parametru vytvori boot_record pro filesystem
  *
@@ -59,7 +101,7 @@ boot_record *create_standard_boot_record()
     // Velikost datove casti: pocet clusteru * velikost clusteru v B
     int32_t data_size = MAX_CLUSTER_COUNT * MAX_CLUSTER_SIZE;
     // Velikost bitmapy: pocet clusteru * velikost bool
-    int32_t bitmap_size = MAX_CLUSTER_COUNT * sizeof(bool);
+    int32_t bitmap_size = MAX_CLUSTER_COUNT * sizeof(int);
     // MFT = 10% datoveho bloku
     int32_t mft_size = (int32_t)(ceil(0.1 * data_size));
     // boot_record size

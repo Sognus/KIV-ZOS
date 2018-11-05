@@ -4,8 +4,14 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+// Znak, ktery bude vyuzit jako vypln prazdneho souboru
+#define NTFS_NEUTRAL_CHAR '\0'
+
 // ID MFT_ITEM v priopade, ze je item prazdny
 #define UID_ITEM_FREE 0
+
+// Pomer velikosti MFT ku velikosti datove slozky FS
+#define MFT_RATIO 0.1
 
 // Maximalni pocet fragmentu v jednom zaznamu MFT
 #define MFT_FRAGMENTS_COUNT 32
@@ -102,5 +108,14 @@ mft_item *create_mft_item(int32_t uid, bool isDirectory, int8_t item_order, int8
  * @return ukazatel na strukturu mft_fragment
  */
 mft_fragment *create_mft_fragment(int32_t fragment_start_adress, int32_t fragment_count);
+
+/**
+ * Na zaklade vstupnich hodnot prepocita hodnoty v boot zaznamu a zmeni je
+ *
+ * @param record zaznam ke zmeneni
+ * @param cluster_count novy pocet clusteru
+ * @param cluster_size velikost jednoho clusteru
+ */
+void boot_record_resize(boot_record *record, int32_t cluster_count, int32_t cluster_size);
 
 #endif //KIV_ZOS_STRUCTURE_H

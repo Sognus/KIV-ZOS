@@ -16,7 +16,10 @@ int main(int argc, char *argv[]) {
 
     printf("NTFS START!\n");
 
-    create_file(argv[1], MAX_CLUSTER_COUNT, MAX_CLUSTER_SIZE);
+    //create_file(argv[1], MAX_CLUSTER_COUNT, MAX_CLUSTER_SIZE);
+    format_file(argv[1],  64000);
+
+
 
     printf("NTFS END!\n");
     return 0;

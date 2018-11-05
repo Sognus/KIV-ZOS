@@ -23,4 +23,20 @@ void create_file(char filename[], int32_t cluster_count, int32_t cluster_size);
  */
 bool file_exists(const char *file_name);
 
+/**
+ * Vrati velikost souboru v bytech, pokud soubor neexustuje, vrati -1
+ *
+ * @param filename nazev souboru
+ * @return velikost souboru v bytech
+ */
+int file_size(const char *filename);
+
+/**
+ * Vytvori soubor zadane velikosti
+ *
+ * @param filename
+ * @param bytes
+ */
+void format_file(char filename[], int bytes);
+
 #endif //KIV_ZOS_NTFS_H

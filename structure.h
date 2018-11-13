@@ -35,7 +35,6 @@ typedef struct boot_record {
     // stejne jako   MFT_FRAGMENTS_COUNT
 } boot_record;
 
-
 typedef struct mft_fragment {
     int32_t fragment_start_address;     //start adresa
     int32_t fragment_count;             //pocet clusteru ve fragmentu
@@ -125,5 +124,28 @@ void boot_record_resize(boot_record *record, int32_t cluster_count, int32_t clus
  * @param record ukazatel na pouzity boot
  */
 void print_bitmap(int *bitmap, boot_record *record);
+
+/**
+ * Vypise pole struktur mft_item
+ *
+ * @param array ukazatel na pole
+ * @param size velikost pole
+ */
+void print_mft_items(mft_item *array, int size);
+
+/**
+ * Vypise jeden mft_item
+ *
+ * @param item ukazatel na mft item
+ */
+void print_mft_item(mft_item item);
+
+/**
+ * Vypise jeden mft fragment
+ *
+ * @param fragment
+ */
+void print_mft_fragment(mft_fragment fragment);
+
 
 #endif //KIV_ZOS_STRUCTURE_H

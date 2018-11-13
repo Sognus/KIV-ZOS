@@ -51,6 +51,17 @@ boot_record *read_boot_record(char filename[]);
 int *read_bitmap(char filename[], boot_record *record);
 
 /**
+ * Na zaklade souboru a bootrecordu s nim spjatym precte ze souboru vsechny neprazdne
+ * struktury mft_item, vysledek navrati skrz ukazatele
+ *
+ * @param filename soubor FS
+ * @param record zaznam FS
+ * @param mft_array ukazatel, pole struktur mft_item
+ * @param mft_array_size ukazatel, pocet prvku mft_item
+ */
+void read_mft_items(char filename[], boot_record *record, mft_item **mft_array, int *mft_array_size);
+
+/**
  * Vytvori soubor zadane velikosti
  *
  * @param filename

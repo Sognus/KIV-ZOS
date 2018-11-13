@@ -205,6 +205,7 @@ void print_boot_record(boot_record *pointer)
 
 }
 
+
 /**
  *  Na zaklade ukazatele vztazeneho k boot recordu vypise bitmapu
  *
@@ -222,4 +223,54 @@ void print_bitmap(int *bitmap, boot_record *record) {
         printf("%d ", bitmap[i]);
     }
     printf("\n");
+}
+
+/**
+ * Vypise pole struktur mft_item
+ *
+ * @param array ukazatel na pole
+ * @param size velikost pole
+ */
+void print_mft_items(mft_item *array, int size)
+{
+    for(int i = 0; i < size; i++)
+    {
+        print_mft_item(array[i]);
+        printf("***\n");
+    }
+}
+
+/**
+ * Vypise jeden mft_item
+ *
+ * @param item ukazatel na mft item
+ */
+void print_mft_item(mft_item item)
+{
+    printf("UID: %d\n", item.uid);
+    printf("DIRECTORY: %d\n", item.isDirectory);
+    printf("ITEM ORDER: %d\n", item.item_order);
+    printf("ITEM ORDER TOTAL: %d\n", item.item_order_total);
+    printf("ITEM NAME: %s\n", item.item_name);
+    printf("ITEM SIZE %d\n", item.item_size);
+
+    printf("**\n");
+    for(int i = 0; i < MFT_FRAGMENTS_COUNT; i++)
+    {
+        print_mft_fragment(item.fragments[i]);
+        printf("*\n");
+    }
+    printf("**\n");
+}
+
+/**
+ * Vypise jeden mft fragment
+ *
+ * @param fragment
+ */
+void print_mft_fragment(mft_fragment fragment)
+{
+    printf("FRAGMENT START ADRESS: %d\n", fragment.fragment_start_address);
+    printf("FRAGMENT COUNT: %d\n", fragment.fragment_count);
+
 }

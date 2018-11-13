@@ -263,6 +263,58 @@ int *read_bitmap(char filename[], boot_record *record)
 }
 
 /**
+ * Na zaklade souboru a bootrecordu s nim spjatym precte ze souboru vsechny neprazdne
+ * struktury mft_item, vysledek navrati skrz ukazatele
+ *
+ * @param filename soubor FS
+ * @param record zaznam FS
+ * @param mft_array ukazatel, pole struktur mft_item
+ * @param mft_array_size ukazatel, pocet prvku mft_item
+ */
+void read_mft_items(char filename[], boot_record *record, mft_item **mft_array, int *mft_array_size)
+{
+    // Overeni existence souboru
+    if(!file_exists(filename))
+    {
+        printf("ERROR: Nelze precist bitmapu ze souboru: Soubor neexistuje!\n");
+        return;
+    }
+
+    // Overeni nenulovitosti struktury boot record
+    if(record == NULL)
+    {
+        printf("ERROR: Boot record nemuze byt NULL!\n");
+        return;
+    }
+
+    // Otevreni souboru
+    FILE *file = fopen(filename, "rb");
+
+    // Precteni dulezitych rad z recordu
+    int32_t mft_addr_start = record->mft_start_address;
+    int32_t mft_addr_end = record->bitmap_start_address - 1;
+    int32_t mft_fragments = record->mft_max_fragment_count;
+
+    // Vypocet maximalniho poctu itemu
+    size_t mft_item_size = sizeof(mft_item);
+    int32_t mft_item_max_count = (int32_t) floor((mft_addr_end - mft_addr_start) / mft_item_size);
+
+    // deklarace pomocnych
+    int array_size = mft_item_max_count;
+    mft_item *array = malloc(mft_item_max_count * mft_item_size);
+
+    // Nastaveni ukazatele souboru
+    fseek(file, mft_addr_start, SEEK_SET);
+
+    // Precteni vsech moznych struktur
+    fread(array, mft_item_size, mft_item_max_count, file);
+
+    *mft_array = array;
+    *mft_array_size = array_size;
+    // TODO: Absolutně pochybuju, že to bude fungovat
+}
+
+/**
  * Na zaklade vstupniho parametru overi, zda soubor s danym jmenem existuje
  *
  * @param file_name nazev/cesta souboru k overeni

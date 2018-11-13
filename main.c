@@ -17,12 +17,15 @@ int main(int argc, char *argv[]) {
     printf("NTFS START!\n");
 
     //create_file(argv[1], MAX_CLUSTER_COUNT, MAX_CLUSTER_SIZE);
-    format_file(argv[1],  64000);
+    format_file(argv[1],  128000);
 
 
 
-    boot_record *record = create_standard_boot_record();
+    boot_record *record = read_boot_record(argv[1]);
     print_boot_record(record);
+
+    int *bitmap = read_bitmap(argv[1], record);
+    print_bitmap(bitmap, record);
 
 
     printf("NTFS END!\n");

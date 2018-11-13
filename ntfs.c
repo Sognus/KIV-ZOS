@@ -188,6 +188,81 @@ void create_file(char filename[], int32_t cluster_count, int32_t cluster_size)
 }
 
 /**
+ *  Na zaklade jmena souboru precte boot_record
+ *
+ * @param filename nazev souboru pro cteni
+ * @return boot record or null
+ */
+boot_record *read_boot_record(char filename[])
+{
+    // Overeni existence souboru
+    if(!file_exists(filename))
+    {
+        printf("ERROR: Nelze precist boot record ze souboru: Soubor neexistuje!\n");
+        return NULL;
+    }
+
+    // Otevreni souboru pro cteni
+    FILE *file = fopen(filename, "r+b");
+    fseek(file, 0, SEEK_SET);
+
+    // Deklarace
+    boot_record *record = malloc(sizeof(boot_record));
+
+    // Nacteni
+    fread(record, sizeof(boot_record), 1, file);
+
+    // Navrat vysledku
+    return record;
+
+}
+
+/**
+ * Na zaklade jmena souboru a boot recordu precte bitmapu
+ *
+ * @param filename soubor, ze ktereho se bude cist
+ * @param record zaznam podle ktereho se bude bitmapa načítat
+ * @return ukazatel na pole (velikost pole je v boot_record)
+ */
+int *read_bitmap(char filename[], boot_record *record)
+{
+    // Overeni existence souboru
+    if(!file_exists(filename))
+    {
+        printf("ERROR: Nelze precist bitmapu ze souboru: Soubor neexistuje!\n");
+        return NULL;
+    }
+
+    // Overeni nenulovitosti struktury boot record
+    if(record == NULL)
+    {
+        printf("ERROR: Boot record nemuze byt NULL!\n");
+        return  NULL;
+    }
+
+    // Otevreni souboru
+    FILE *file = fopen(filename, "rb");
+
+    // Cluster count = pocet polozek bitmapy
+    int32_t bitmap_size = record->cluster_count;
+    int32_t bitmap_addr = record->bitmap_start_address;
+
+    // Priprava pameti pro bitmapu
+    int *bitmap = malloc(sizeof(int) * bitmap_size);
+
+    // Nastaveni adresy pro cteni
+    fseek(file, bitmap_addr, SEEK_SET);
+
+    // Nacteni dat do paměti
+    fread(bitmap, sizeof(int), bitmap_size, file);
+
+    // TODO: Kontrola? Ale jak :(
+
+    // Navrat ukazatele na bitmapu
+    return bitmap;
+}
+
+/**
  * Na zaklade vstupniho parametru overi, zda soubor s danym jmenem existuje
  *
  * @param file_name nazev/cesta souboru k overeni

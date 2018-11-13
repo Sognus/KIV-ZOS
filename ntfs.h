@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "structure.h"
+
 #ifndef KIV_ZOS_NTFS_H
 #define KIV_ZOS_NTFS_H
 
@@ -30,6 +32,23 @@ bool file_exists(const char *file_name);
  * @return velikost souboru v bytech
  */
 int file_size(const char *filename);
+
+/**
+ *  Na zaklade jmena souboru precte boot_record
+ *
+ * @param filename nazev souboru pro cteni
+ * @return boot record or null
+ */
+boot_record *read_boot_record(char filename[]);
+
+/**
+ * Na zaklade jmena souboru a boot recordu precte bitmapu
+ *
+ * @param filename soubor, ze ktereho se bude cist
+ * @param record zaznam podle ktereho se bude bitmapa načítat
+ * @return ukazatel na pole (velikost pole je v boot_record)
+ */
+int *read_bitmap(char filename[], boot_record *record);
 
 /**
  * Vytvori soubor zadane velikosti

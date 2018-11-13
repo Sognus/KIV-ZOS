@@ -204,3 +204,22 @@ void print_boot_record(boot_record *pointer)
     printf("MFT fragment count: %d\n", pointer->mft_max_fragment_count);
 
 }
+
+/**
+ *  Na zaklade ukazatele vztazeneho k boot recordu vypise bitmapu
+ *
+ * @param bitmap ukazatel na bitmapu v pameti
+ * @param record ukazatel na pouzity boot
+ */
+void print_bitmap(int *bitmap, boot_record *record) {
+    if (record == NULL || bitmap == NULL) {
+        // Nelze vypsat bitmapu
+        printf("ERROR: Nelze vypsat bitmapu!\n");
+        return;
+    }
+
+    for (int i = 0; i < record->cluster_count; i++) {
+        printf("%d ", bitmap[i]);
+    }
+    printf("\n");
+}

@@ -118,4 +118,12 @@ mft_fragment *create_mft_fragment(int32_t fragment_start_adress, int32_t fragmen
  */
 void boot_record_resize(boot_record *record, int32_t cluster_count, int32_t cluster_size);
 
+/**
+ *  Na zaklade ukazatele vztazeneho k boot recordu vypise bitmapu
+ *
+ * @param bitmap ukazatel na bitmapu v pameti
+ * @param record ukazatel na pouzity boot
+ */
+void print_bitmap(int *bitmap, boot_record *record);
+
 #endif //KIV_ZOS_STRUCTURE_H

@@ -233,11 +233,25 @@ void print_bitmap(int *bitmap, boot_record *record) {
  */
 void print_mft_items(mft_item *array, int size)
 {
+    int zero_uid = 0;
+
     for(int i = 0; i < size; i++)
     {
+        mft_item itm = array[i];
+
+        // Vypocet poctu prazdnych mft itemu
+        if(itm.uid == 0)
+        {
+            zero_uid = zero_uid + 1;
+            continue;
+        }
+
         print_mft_item(array[i]);
         printf("***\n");
     }
+    // vypis poctu prazdnych mft itemu
+    printf("EMPTY MFT ITEMS COUNT: %d\n", zero_uid);
+    printf("***\n");
 }
 
 /**
@@ -247,6 +261,8 @@ void print_mft_items(mft_item *array, int size)
  */
 void print_mft_item(mft_item item)
 {
+    int empty_fragments = 0;
+
     printf("UID: %d\n", item.uid);
     printf("DIRECTORY: %d\n", item.isDirectory);
     printf("ITEM ORDER: %d\n", item.item_order);
@@ -257,10 +273,21 @@ void print_mft_item(mft_item item)
     printf("**\n");
     for(int i = 0; i < MFT_FRAGMENTS_COUNT; i++)
     {
+        mft_fragment frag = item.fragments[i];
+
+        // Vypocet prazdnych fragmentu pro redukci textu
+        if(frag.fragment_count == -1 && frag.fragment_start_address == -1 )
+        {
+            empty_fragments = empty_fragments + 1;
+            continue;
+        }
+
         print_mft_fragment(item.fragments[i]);
         printf("*\n");
     }
-    printf("**\n");
+    // Vypis poctu prazdnych fragmentu
+    printf("EMPTY FRAGMENTS COUNT: %d\n", empty_fragments);
+    printf("*\n");
 }
 
 /**

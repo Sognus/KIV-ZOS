@@ -174,10 +174,11 @@ void create_file(char filename[], int32_t cluster_count, int32_t cluster_size)
     /* ---------------------------------------------------------------------------------------------------- */
     /* ZAPIS ROOTU  */
     fseek(file, record->data_start_address, SEEK_SET);
-    char odkaz[2];
-    odkaz[0] = '0';
-    odkaz[1] = '\0';
-    fwrite(odkaz, 1, 2, file);
+    int32_t odkaz[2];
+    // Prvni dve polozky jsou (1) aktualni slozka (2) nadrazena slozka
+    odkaz[0] = 1;
+    odkaz[1] = 1;
+    fwrite(odkaz, sizeof(int32_t), 2, file);
 
     // Uvolneni pameti
     fflush(file);
@@ -258,6 +259,9 @@ int *read_bitmap(char filename[], boot_record *record)
 
     // TODO: Kontrola? Ale jak :(
 
+    // UKLID
+    fclose(file);
+
     // Navrat ukazatele na bitmapu
     return bitmap;
 }
@@ -312,6 +316,9 @@ void read_mft_items(char filename[], boot_record *record, mft_item **mft_array, 
     *mft_array = array;
     *mft_array_size = array_size;
     // TODO: Absolutně pochybuju, že to bude fungovat
+
+    // UKLID
+    fclose(file);
 }
 
 /**
@@ -330,6 +337,8 @@ bool file_exists(const char *fname)
     }
     return 0;
 }
+
+
 
 /**
  * Vrati velikost souboru v bytech, pokud soubor neexustuje, vrati -1

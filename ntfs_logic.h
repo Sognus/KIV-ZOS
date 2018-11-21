@@ -78,4 +78,70 @@ int get_folder_members_count(shell *shell, int32_t uid);
  */
 void get_folder_members(shell *shell, int32_t uid, int **out_array, int *out_count);
 
+/**
+ *  * Na zaklade aktualniho kontextu shell, najde PRVNI PRAZDNOU adresu a poradi daneho clusteru
+ *
+ * @param shell kontext funkce
+ * @param cluster_addr ukazatel na output int jaka je adresa clusteru volneho
+ * @param cluster_order ukazatel na output int kolikaty je volny cluster v bitmape
+ * @return chybova hlaska, 0 = bez chyby, <-max, 0) = error, (0, max) = notice
+ */
+int32_t find_empty_cluster(shell *shell, int32_t *cluster_addr, int *cluster_order);
+
+/**
+ * Projde MFT tabulku, najde dalsi volne uid
+ *
+ * Nejprve inkrementuje nejvyssi nalezene cislo o 1, v pripade, ze je dosahnuto maximalniho
+ * cisla 32bit, pak prochazi cisla od 1 do max cisla
+ *
+ * @param shell
+ * @return
+ */
+int32_t get_next_uid(shell *shell);
+
+/**
+ * Porovna dve struktury na zaklade UID pro Qsort
+ *
+ * @param s1 struktura 1
+ * @param s2 struktura 2
+ * @return porovnani
+ */
+int compare_mft_items(const void *s1, const void *s2);
+
+/**
+ * Nalezne index volneho mft itemu, pokud neexistuje, hodi -2
+ *
+ * @param shell
+ * @return index volneho mft itemu nebo chyba
+ */
+int get_free_mft_item_index(shell *shell);
+
+/**
+ * Prida fyzicky zaznam o souboru/slozce/symlinku do nadrazene slozky
+ *
+ * @param shell kontext
+ * @param parent_uid uid nadrazene slozky
+ * @param add_uid pridavane uid
+ * @return chyba nebo uspech ( = 0 )
+ *
+ */
+int parrent_add_uid(shell *shell, int32_t parent_uid, int32_t add_uid);
+
+/**
+ * Vrati pocet alokovanych clusteru k jednomu mft itemu
+ *
+ * @param shell
+ * @param mft_item
+ * @return
+ */
+int get_allocated_cluster_count(mft_item *mft_item);
+
+/**
+ *  Vrati adresu dalsiho prvku kam zapsat UID
+ *
+ * @param shell
+ * @param uid
+ */
+int get_folder_next_member_adress(shell *shell, int32_t uid);
+
 #endif //KIV_ZOS_NTFS_LOGIC_H

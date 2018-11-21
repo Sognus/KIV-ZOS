@@ -110,6 +110,59 @@ int main(int argc, char *argv[]) {
         printf("UID: %d\n", uids[i]);
     }
 
+    printf("\n\n");
+
+    // Prvni volny cluster
+    int32_t *first_empty_addr = malloc(sizeof(int32_t));
+    int32_t *first_empty_iter = malloc(sizeof(int32_t));
+    find_empty_cluster(sh, first_empty_addr, first_empty_iter);
+    printf("FIRST EMPTY CLUSTER ADDR: %d\n", *first_empty_addr);
+    printf("FIRST EMPTY CLUSTER BITMAP INDEX: %d\n", *first_empty_iter);
+
+    printf("\n\n");
+
+    // Nalezeni prvniho volneho UID
+    int32_t next_uid = get_next_uid(sh);
+    printf("NEXT FREE UID: %d\n", next_uid);
+
+    printf("\n\n");
+
+
+    // Vytvoreni slozky
+    printf("CREATING FOLDER NAMED TEST\n");
+    int operation_code = create_folder(sh, "test");
+    printf("CREATE OPERATION CODE: %d\n", operation_code);
+
+    printf("\n\n");
+
+    // Precteni souboru shell2
+    shell *shell2 = create_root_shell(record, argv[1]);
+    printf("READING BITMAP AFTER FOLDER CREATE: \n");
+    int *bitmap2 = read_bitmap(argv[1], record);
+    print_bitmap(bitmap2, record);
+    printf("\n");
+
+    printf("READING MFT AFTER FOLDER CREATE: \n");
+    mft_item *mft_array2 = NULL;
+    int mft_array_size2 = -1;
+    read_mft_items(argv[1], record, &mft_array2, &mft_array_size2);
+    print_mft_items(mft_array2, mft_array_size2);
+    printf("\n\n\n\n\n");
+
+    int *uids2 = NULL;
+    int uid_count2 = -1;
+    get_folder_members(sh, 2, &uids2, &uid_count2);
+    // VYPIS IDECEK
+    printf("VYPIS IDECEK TESTU:\n");
+    for(int i = 0; i < uid_count2; i++)
+    {
+        printf("UID: %d\n", uids2[i]);
+    }
+
+
+    printf("\n\n");
+    printf("\n\n");
+
     printf("NTFS END!\n");
     return 0;
 }

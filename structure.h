@@ -4,6 +4,9 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+// ID rootu
+#define NTFS_ROOT_UID 1
+
 // Znak, ktery bude vyuzit jako vypln prazdneho souboru
 #define NTFS_NEUTRAL_CHAR '\0'
 

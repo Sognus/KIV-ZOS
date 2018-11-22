@@ -8,6 +8,7 @@
 #include "ntfs.h"
 #include "ntfs_logic.h"
 #include "shell.h"
+#include "path_logic.h"
 
 /*
  * TODO: Implementace commandu ve virtual shellu
@@ -162,6 +163,35 @@ int main(int argc, char *argv[]) {
 
     printf("\n\n");
     printf("\n\n");
+
+    // Test cesty
+    shell *shell3 = create_root_shell(record, argv[1]);
+    printf("VYPISUJI CESTU ROOTU: \n");
+    printf("%s\n", get_current_path(shell3));
+
+    printf("VYPISUJI CESTU TEST: \n");
+    shell3->cwd = 2;
+    printf("%s\n", get_current_path(shell3));
+
+    printf("\n\n");
+    printf("\n\n");
+
+    // Vytvarim slozku ahoj ve slozce TEST
+    create_folder(shell3, "ahoj");
+
+    printf("READING MFT AFTER FOLDER CREATE: \n");
+    mft_item *mft_array3 = NULL;
+    int mft_array_size3 = -1;
+    read_mft_items(argv[1], record, &mft_array3, &mft_array_size3);
+    print_mft_items(mft_array3, mft_array_size3);
+
+    printf("VYPISUJI CESTU AHOJ: \n");
+    shell3->cwd = 3;
+    printf("%s\n", get_current_path(shell3));
+
+
+    printf("\n\n");
+
 
     printf("NTFS END!\n");
     return 0;

@@ -602,7 +602,7 @@ int get_folder_members_count(shell *shell, int32_t uid)
             // Precteni data
             fread(read_uid, sizeof(int32_t), 1, file);
 
-            //printf("DEBUG IDčko %d\n", *read_uid);
+            //printf("DEBUG IDko %d\n", *read_uid);
 
             // Jestlize mame uid vetsi jak 0 mame uid clenu current slozky
             if(*read_uid > 0)
@@ -757,6 +757,7 @@ void get_folder_members(shell *shell, int32_t uid, int **out_array, int *out_cou
     }
 
     // Zjisteni poctu UID
+
     int array_size = get_folder_members_count(shell, uid);
 
     // Overeni zda se neco nerozbilo
@@ -765,6 +766,7 @@ void get_folder_members(shell *shell, int32_t uid, int **out_array, int *out_cou
         // Rozbilo se neco - podle navratove hodnoty - 0 = blbost, slozka nemuze mit 0 UID v sobe
         return;
     }
+
 
     // Vytvoreni pole o zjistene velikosti
     int *array = malloc(array_size * sizeof(int32_t));

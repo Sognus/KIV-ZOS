@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdlib.h>
-#include <mem.h>
+#include <memory.h>
 #include <string.h>
 
 #include "structure.h"
@@ -192,7 +192,23 @@ int main(int argc, char *argv[]) {
 
     printf("\n\n");
 
+    // EXISTENCE CESTY
+    printf("EXISTUJE CESTA K ROOTU: %d\n", path_exist(shell3, "/"));
+    printf("\n");
+    printf("EXISTUJE CESTA K TEST: %d\n", path_exist(shell3, "/test/"));
+    printf("\n");
+    printf("EXISTUJE CESTA K TEST2: %d\n", path_exist(shell3, "/test"));
+    printf("\n");
+    printf("EXISTUJE CESTA K AHOJ: %d\n", path_exist(shell3, "/test/ahoj"));
+    printf("\n");
+    printf("EXISTUJE CESTA K SVETE: %d\n", path_exist(shell3, "/svete/"));
+    printf("\n");
+    printf("EXISTUJE CESTA K CURRENT WORKING DIRECTORY (%s): %d\n", get_current_path(shell3), path_exist(shell3, get_current_path(shell3)));
+    printf("\n");
+
+    printf("\n\n");
 
     printf("NTFS END!\n");
+
     return 0;
 }

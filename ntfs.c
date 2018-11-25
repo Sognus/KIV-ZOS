@@ -1,6 +1,7 @@
 #include <math.h>
 #include "ntfs.h"
 #include "structure.h"
+#include "math.h"
 
 
 // POZN: MFT je 10% data size

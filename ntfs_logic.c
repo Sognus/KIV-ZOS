@@ -195,12 +195,11 @@ int create_folder(shell *shell, char folder_name[12])
         return -5;
     }
 
-
     // Na tuto adresu zapiseme mft item
     int32_t mft_addr = shell->boot->mft_start_address + (sizeof(mft_item) * index);
 
     // Pridat UID do parent slozky
-    parrent_add_uid(shell, shell->cwd, uid);
+    int parent_operation = parrent_add_uid(shell, shell->cwd, uid);
 
     // Precteni bitmapy - zapis #1
     int *bitmap = read_bitmap(shell->filename, shell->boot);
@@ -314,7 +313,7 @@ int parrent_add_uid(shell *shell, int32_t parent_uid, int32_t add_uid)
     // Uzavreni souboru
     fclose(file);
 
-
+    return 0;
 }
 
 /**
@@ -708,8 +707,6 @@ int get_folder_next_member_adress(shell *shell, int32_t uid)
                 estimated_count = estimated_count + 1;
             }
 
-            // Uklid po fread
-            free(read_uid);
 
             // pokud mame 0, nasli jsme volne misto
             if(*read_uid == 0)
@@ -717,6 +714,9 @@ int get_folder_next_member_adress(shell *shell, int32_t uid)
                 fclose(file);
                 return  current_addr;
             }
+
+            // Uklid po fread
+            free(read_uid);
 
             // Posun po 4 bytes
             current_addr = current_addr + sizeof(int32_t);

@@ -53,6 +53,121 @@ int main(int argc, char *argv[]) {
         printf("ERROR: Program was started without arguments!");
         return -1;
     }
+}
+
+int test_folder(int argc, char *argv[])
+{
+    // Deklarace
+    int *uids = NULL;
+    int uid_count = -1;
+
+    if(argc < 2)
+    {
+        printf("ERROR: Program was started without arguments!");
+        return -1;
+    }
+
+    printf("NTFS START!\n");
+    printf("\n");
+
+    // Vytvoreni FS
+    printf("CREATING FORMATTED FILE!\n");
+    format_file(argv[1],  128000);
+
+
+    // Precteci BR z FS
+    printf("READING BOOT RECORD!\n");
+    boot_record *record = read_boot_record(argv[1]);
+    print_boot_record(record);
+    printf("\n");
+
+    // Precteni bitmapy z FS
+    printf("READING BITMAP!\n");
+    int *bitmap = read_bitmap(argv[1], record);
+    print_bitmap(bitmap, record);
+    printf("\n");
+
+    // Vytvoreni SHELLU
+    printf("CREATING SHELL!\n");
+    shell *sh = create_root_shell(record, argv[1]);
+
+    // IDCKA
+    get_folder_members(sh, sh->cwd, &uids, &uid_count);
+    // VYPIS IDECEK
+    printf("VYPIS IDECEK ROOTU:\n");
+    for(int i = 0; i < uid_count; i++)
+    {
+        printf("UID: %d\n", uids[i]);
+    }
+
+    // CREATE MULTIPLE FOLDER
+    create_folder(sh, "folder1");
+    create_folder(sh, "folder2");
+    create_folder(sh, "folder3");
+
+    // IDCKA
+    *uids = NULL;
+    uid_count = -1;
+    get_folder_members(sh, sh->cwd, &uids, &uid_count);
+    // VYPIS IDECEK
+    printf("VYPIS IDECEK ROOTU:\n");
+    for(int i = 0; i < uid_count; i++)
+    {
+        printf("(%d) -> %s\n", uids[i], find_mft_item_by_uid(sh,uids[i])->item_name);
+    }
+
+    printf("\n\n");
+
+    //  VYTVORENI SLOZEK V JINYCH SLOZKACH
+    //  prikaz: cd /folder1
+    sh->cwd = 2;
+    *uids = NULL;
+    uid_count = -1;
+    get_folder_members(sh, sh->cwd, &uids, &uid_count);
+    // VYPIS IDECEK
+    printf("VYPIS IDECEK FOLDER1:\n");
+    for(int i = 0; i < uid_count; i++)
+    {
+        printf("(%d) -> %s\n", uids[i], find_mft_item_by_uid(sh,uids[i])->item_name);
+    }
+
+    create_folder(sh,"test1");
+    create_folder(sh,"test2");
+    create_folder(sh,"test3");
+
+    uids = NULL;
+    uid_count = -1;
+    get_folder_members(sh, sh->cwd, &uids, &uid_count);
+    // VYPIS IDECEK
+    printf("VYPIS IDECEK FOLDER1:\n");
+    for(int i = 0; i < uid_count; i++)
+    {
+        printf("(%d) -> %s\n", uids[i], find_mft_item_by_uid(sh,uids[i])->item_name);
+    }
+
+    bitmap = read_bitmap(sh->filename, sh->boot);
+    print_bitmap(bitmap, sh->boot);
+
+    printf("\n");
+
+    // TEST PATH
+    printf("/ -> %d\n",path_exist(sh, "/"));
+    printf("/folder1 -> %d\n",path_exist(sh, "/folder1"));
+    printf("/folder1/ -> %d\n",path_exist(sh, "/folder1/"));
+    printf("/folder1/test3 -> %d\n",path_exist(sh, "/folder1/test3"));
+    printf("/folder1/test3/ -> %d\n",path_exist(sh, "/folder1/test3/"));
+    printf("/folder1/test4 -> %d\n",path_exist(sh, "/folder1/test4"));
+
+    return 0;
+}
+
+// Obecny test systemu - netrideny
+int test(int argc, char *argv[]) {
+    if(argc < 2)
+    {
+        printf("ERROR: Program was started without arguments!");
+        return -1;
+    }
 
     printf("NTFS START!\n");
     printf("\n");

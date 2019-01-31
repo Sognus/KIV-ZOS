@@ -182,7 +182,7 @@ int path_exist(shell *shell, char *path)
     }
 
     int path_len = strlen(path);
-    printf("PATH: %s \n", path);
+    //printf("PATH: %s \n", path);
 
     /*
      * Implementovany syntax cesty

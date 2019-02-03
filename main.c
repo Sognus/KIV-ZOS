@@ -9,6 +9,7 @@
 #include "ntfs_logic.h"
 #include "shell.h"
 #include "path_logic.h"
+#include "shell_app.h"
 
 /*
  * TODO: Implementace commandu ve virtual shellu
@@ -42,18 +43,17 @@
  *          zapise se mft item, vytvori se mft fragment
  *          do fragmentu se zapise uid aktualniho souboru a uid rodice (dle cesty
  *
+ *      TODO:
+ *          Prevod relativni cesty na absolutni
+ *          tj.
+ *              slozka/slozka -> $cwd$/cesta
+ *              ./slozka/slozka -> slozka/slozka -> $cwd$/cesta
+ *              ../../slozka/slozka -> parrent(cwd) -> parent(cwd) -> slozka/slozka -> $cwd$/slozka/slozka
  *
  *
  *
  */
 
-int main(int argc, char *argv[]) {
-    if(argc < 2)
-    {
-        printf("ERROR: Program was started without arguments!");
-        return -1;
-    }
-}
 
 int test_folder(int argc, char *argv[])
 {
@@ -106,7 +106,7 @@ int test_folder(int argc, char *argv[])
     create_folder(sh, "folder3");
 
     // IDCKA
-    *uids = NULL;
+    uids = NULL;
     uid_count = -1;
     get_folder_members(sh, sh->cwd, &uids, &uid_count);
     // VYPIS IDECEK
@@ -121,7 +121,7 @@ int test_folder(int argc, char *argv[])
     //  VYTVORENI SLOZEK V JINYCH SLOZKACH
     //  prikaz: cd /folder1
     sh->cwd = 2;
-    *uids = NULL;
+    uids = NULL;
     uid_count = -1;
     get_folder_members(sh, sh->cwd, &uids, &uid_count);
     // VYPIS IDECEK
@@ -157,6 +157,24 @@ int test_folder(int argc, char *argv[])
     printf("/folder1/test3 -> %d\n",path_exist(sh, "/folder1/test3"));
     printf("/folder1/test3/ -> %d\n",path_exist(sh, "/folder1/test3/"));
     printf("/folder1/test4 -> %d\n",path_exist(sh, "/folder1/test4"));
+
+    printf("\n");
+    sh->cwd = 2;
+    printf("test3 -> %d\n",path_exist(sh, "test3"));
+    printf("test4 -> %d\n",path_exist(sh, "test4"));
+    printf("test5 -> %d\n",path_exist(sh, "test5"));
+    printf("test6 -> %d\n",path_exist(sh, "test6"));
+    printf("test1 -> %d\n",path_exist(sh, "test1"));
+    printf("test2 -> %d\n",path_exist(sh, "test2"));
+
+    printf("\n");
+    sh->cwd = 7;
+    printf("../test2 -> %d\n",path_exist(sh, "../test2"));
+    printf("./test3 -> %d\n",path_exist(sh, "./test3"));
+    printf("../../folder3 -> %d\n",path_exist(sh, "../../folder3"));
+    printf("../../ -> %d\n",path_exist(sh, "../../"));
+
+    printf("\n\n");
 
     return 0;
 }
@@ -326,4 +344,16 @@ int test(int argc, char *argv[]) {
     printf("NTFS END!\n");
 
     return 0;
+}
+
+int main(int argc, char *argv[]) {
+    if(argc < 2)
+    {
+        printf("ERROR: Program was started without arguments!");
+        return -1;
+    }
+
+    test_folder(argc, argv);
+
+    return shell_app_main(argv[1]);
 }

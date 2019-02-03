@@ -144,4 +144,15 @@ int get_allocated_cluster_count(mft_item *mft_item);
  */
 int get_folder_next_member_adress(shell *shell, int32_t uid);
 
+/**
+ * Zjisti uid rodicovske slozky
+ * pro koren je rodicovska slozka koren
+ * pokud je vstupni parament cwd zaporny, vyuzije se shell->cwd
+ *
+ * @param shell
+ * @param cwd
+ * @return
+ */
+int32_t get_parent_uid(shell *shell, int32_t cwd);
+
 #endif //KIV_ZOS_NTFS_LOGIC_H

@@ -307,8 +307,95 @@ int path_exist(shell *shell, char *path)
          * TODO: prochazet FS od CWD->COD misto od rootu
          * TODO: .. prepne COD na nadrazenou slozku (pokud se narazi na roota, zustava v rootu - parent rootu je root)
          *
+         * ./test -> test -> $cwd$/test
+         * ../.. -> parent_folder(cwd) -> parentfolder(cwd
          */
-        return 20;
+
+        char buffer[128] = {0};
+        int buffer_used = 0;
+        int cod = shell->cwd;
+
+        while(true)
+        {
+            char c = *path;
+
+
+            // Nalezli jsme oddelovace
+            if(c == '/' || c == '\0')
+            {
+
+                buffer[buffer_used] = '\0';
+                buffer_used++;
+
+                if(strcmp(buffer, "..") == 0)
+                {
+                    // Zjisteni nadrazene slozky
+                    cod = get_parent_uid(shell, cod);
+                    // reset
+                    buffer_used = 0;
+                    memset(buffer, 0, 128);
+                    path = path + 1;
+                    continue;
+                }
+
+                if(strcmp(buffer, ".") == 0)
+                {
+                    // reset
+                    buffer_used = 0;
+                    memset(buffer, 0, 128);
+                    path = path + 1;
+                    continue;
+                }
+
+                // Deklarace
+                int *uids = NULL;
+                int uid_count = -1;
+                get_folder_members(shell, cod, &uids, &uid_count);
+                int found = 0;
+                for(int i = 0; i < uid_count; i++)
+                {
+                    mft_item *item = find_mft_item_by_uid(shell, uids[i]);
+                    if(strcmp(buffer, item->item_name) == 0)
+                    {
+                        cod = item->uid;
+                        found = 1;
+                        break;
+                    }
+                }
+
+                if(cod == 1 && strlen(buffer) < 1) return true;
+
+                if(found == 0) return false;
+
+                // reset
+                buffer_used = 0;
+                memset(buffer, 0, 128);
+            }
+
+            buffer[buffer_used] = *path;
+            buffer_used++;
+            path = path+1;
+
+            if(c == '\0')
+            {
+                break;
+            }
+        }
+
+        return true;
     }
 
+}
+
+/*      TODO:
+*          Prevod relativni cesty na absolutni
+ *          tj.
+*              slozka/slozka -> $cwd$/cesta
+*              ./slozka/slozka -> slozka/slozka -> $cwd$/cesta
+*              ../../slozka/slozka -> parrent(cwd) -> parent(cwd) -> slozka/slozka -> $cwd$/slozka/slozka
+*
+*/
+char *relative_path_to_absolute(shell *shell, char *path)
+{
+    return NULL;
 }

@@ -8,6 +8,7 @@
 #include "path_logic.h"
 #include "shell.h"
 #include "ntfs_logic.h"
+#include "usefull_functions.h"
 
 // Oddelovac slozek
 #define PATH_SEPARATOR '/'
@@ -39,6 +40,7 @@ char *get_current_path(shell *shell);
  * @return
  */
 int path_exist(shell *shell, char *path);
+
 
 
 #endif //KIV_ZOS_PATH_LOGIC_H

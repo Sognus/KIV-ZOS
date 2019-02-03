@@ -111,6 +111,33 @@ mft_item *find_mft_item_by_uid(shell *shell, int32_t uid)
 
 }
 
+/**
+ * Zjisti uid rodicovske slozky
+ * pro koren je rodicovska slozka koren
+ * pokud je vstupni parament cwd zaporny, vyuzije se shell->cwd
+ *
+ * @param shell
+ * @param cwd
+ * @return
+ */
+int32_t get_parent_uid(shell *shell, int32_t cwd)
+{
+    int *uids = NULL;
+    int uid_count = -1;
+
+
+    if(cwd < 0) cwd = shell->cwd;
+
+    get_folder_members(shell, cwd, &uids, &uid_count);
+
+    if(uid_count < 2)
+    {
+        return -1;
+    }
+
+    return uids[1];
+}
+
 
 
 

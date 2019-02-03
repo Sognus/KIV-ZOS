@@ -387,6 +387,236 @@ int path_exist(shell *shell, char *path)
 
 }
 
+int path_target_uid(shell *shell, char *path)
+{
+    if(path_exist(shell, path) != true)
+    {
+        return -50;
+    }
+
+    // Detekce validity kontextu
+    if(shell == NULL)
+    {
+        // -1 = Kontext nesmi byt null
+        return -1;
+
+    }
+
+    // Overeni delky cesty
+    if(path == NULL || strlen(path) < 1)
+    {
+        // -2 = Ukazatel je NULL nebo je retezec moc kratky
+        return -2;
+    }
+
+    int path_len = strlen(path);
+    //printf("PATH: %s \n", path);
+
+    /*
+     * Implementovany syntax cesty
+     * absolutni
+     *  /dir1/dir2/file
+     *  /dir1/dir2/file/
+     *  /dir1/dir2/dir3/
+     *  /dir1/dir2/dir3
+     * relativni
+     *  dir1/dir2/dir3
+     *  .././dir
+     *  ../../
+     *
+     */
+
+    // Pokud cesta zacina / je vzdy absolutni
+    if(path[0] == '/')
+    {
+        // Nacitam znaky tak dlouho dokud nenarazim na dalsi / ci konec retezce
+        char buffer[PATH_PART_MAX_LENGTH];
+        int buffer_used = 0;
+        memset(buffer, 0, PATH_PART_MAX_LENGTH);
+
+        // Current operation directory (1 = ROOT)
+        int cod = NTFS_ROOT_UID;
+        // Urcuje zda byl znak separatoru nalezen ci ne
+        int first_separator = 0;
+
+        mft_item *item = NULL;
+
+        for(int i = 0 ; i < strlen(path)+1; i++) {
+            // Aktualni znak
+            char current_char = i == strlen(path) ? path[i-1] : path[i];
+
+            // Pridani prvniho lomitka do bufferu - pro overeni rootu
+            if(i == 0 || (i == path_len-1 && current_char != '/'))
+            {
+                buffer[buffer_used] = current_char;
+                buffer_used++;
+                first_separator = 1;
+            }
+
+            // Jsme na poslednim znaku nebo jsme nalezli jsme dalsi cestu
+            if (i == path_len-1 || current_char == PATH_SEPARATOR) {
+                // Zpracovani retezce - nalezneme vsechny MFT itemy v COD
+                int *uids = NULL;
+                int uid_count = -1;
+
+                get_folder_members(shell, cod, &uids, &uid_count);
+
+                // Overeni zpracovani podslozek/souboru ve slozce
+                if(uids == NULL || uid_count < 1)
+                {
+                    // Nebyla nalezena podslozka/soubor -> tj. cesta neexistuje
+                    return 0;
+                }
+
+                // Prochazime vsechny idcka - hledame jmeno
+                int name_found = 0;
+                for(int a = 0; a < uid_count; a++)
+                {
+                    // Nalezeni MFT zaznamu pro UID
+                    item = find_mft_item_by_uid(shell, uids[a]);
+
+                    if(item == NULL)
+                    {
+                        // Nebyl nalezen MFT zaznam pro podslozku
+                        return -3;
+                    }
+
+                    //printf("ITEM_NAME: %s VS ", item->item_name);
+                    //printf("BUFFER: %s ", buffer);
+                    //printf("(CMP: %d)\n", strcmp(item->item_name, buffer));
+
+                    // Overeni jmena slozky/souboru
+                    if(strcmp(item->item_name, buffer) == 0)
+                    {
+                        name_found = 1;
+                        cod = item->uid;
+
+                        // Vymazani pouziteho bufferu po nalezeni
+                        memset(buffer, 0, PATH_PART_MAX_LENGTH);
+                        buffer_used = 0;
+
+                        break;
+                    }
+                }
+
+                // Overeni zda byl item nalezen
+                if(name_found == 0)
+                {
+                    // Nebyl -> tj. cesta neexistuje
+                    return 0;
+                }
+
+                // Vymazani pouziteho bufferu
+                memset(buffer, 0, PATH_PART_MAX_LENGTH);
+                buffer_used = 0;
+            }
+
+            // Osetreni posledniho znaku
+            if(i == path_len - 1)
+            {
+                break;
+            }
+
+            // Pridani znaku do bufferu - krome separatoru
+            if(current_char != PATH_SEPARATOR) {
+                buffer[buffer_used] = current_char;
+                buffer_used++;
+            }
+
+        }
+        // Vsechno v ceste bylo nalezeno -> tj. cesta existuje
+        return (item == NULL ? -50 : item->uid);
+
+    }
+    else // Jinak je cesta relativni
+    {
+        // TODO: Overeni relativni cesty
+        /*
+         * TODO: nacitat pocet ..
+         * TODO: ignorovat ./
+         * TODO: prochazet FS od CWD->COD misto od rootu
+         * TODO: .. prepne COD na nadrazenou slozku (pokud se narazi na roota, zustava v rootu - parent rootu je root)
+         *
+         * ./test -> test -> $cwd$/test
+         * ../.. -> parent_folder(cwd) -> parentfolder(cwd
+         */
+
+        char buffer[128] = {0};
+        int buffer_used = 0;
+        int cod = shell->cwd;
+
+        while(true)
+        {
+            char c = *path;
+
+
+            // Nalezli jsme oddelovace
+            if(c == '/' || c == '\0')
+            {
+
+                buffer[buffer_used] = '\0';
+                buffer_used++;
+
+                if(strcmp(buffer, "..") == 0)
+                {
+                    // Zjisteni nadrazene slozky
+                    cod = get_parent_uid(shell, cod);
+                    // reset
+                    buffer_used = 0;
+                    memset(buffer, 0, 128);
+                    path = path + 1;
+                    continue;
+                }
+
+                if(strcmp(buffer, ".") == 0)
+                {
+                    // reset
+                    buffer_used = 0;
+                    memset(buffer, 0, 128);
+                    path = path + 1;
+                    continue;
+                }
+
+                // Deklarace
+                int *uids = NULL;
+                int uid_count = -1;
+                get_folder_members(shell, cod, &uids, &uid_count);
+                int found = 0;
+                for(int i = 0; i < uid_count; i++)
+                {
+                    mft_item *item = find_mft_item_by_uid(shell, uids[i]);
+                    if(strcmp(buffer, item->item_name) == 0)
+                    {
+                        cod = item->uid;
+                        found = 1;
+                        break;
+                    }
+                }
+
+                if(cod == 1 && strlen(buffer) < 1) return cod;
+
+                if(found == 0) return -50;
+
+                // reset
+                buffer_used = 0;
+                memset(buffer, 0, 128);
+            }
+
+            buffer[buffer_used] = *path;
+            buffer_used++;
+            path = path+1;
+
+            if(c == '\0')
+            {
+                break;
+            }
+        }
+
+        return cod;
+    }
+
+}
+
 /*      TODO:
 *          Prevod relativni cesty na absolutni
  *          tj.

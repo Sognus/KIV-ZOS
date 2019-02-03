@@ -353,7 +353,7 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
-    test_folder(argc, argv);
+    //test_folder(argc, argv);
 
     return shell_app_main(argv[1]);
 }

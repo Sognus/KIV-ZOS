@@ -97,8 +97,21 @@ int command_cd(shell *shell, char *command)
     char *ptr = strtok(command, delim);
     ptr = strtok(NULL, delim);
 
+    int target_dir = path_target_uid(shell, ptr);
 
-    printf("path: %s\n", ptr);
+    // Nastavit
+    if(target_dir > 0)
+    {
+        printf("OK\n");
+        shell->cwd = target_dir;
+
+    }
+    else
+    {
+        printf("PATH NOT FOUND (neexistující cesta)\n");
+    }
+
+    printf("path: %s -> %d\n", ptr, target_dir);
 
     return 0;
 }

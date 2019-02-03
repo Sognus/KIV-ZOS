@@ -41,6 +41,15 @@ char *get_current_path(shell *shell);
  */
 int path_exist(shell *shell, char *path);
 
+/**
+ * Vrati UID cilove slozky
+ *
+ * @param shell
+ * @param path
+ * @return
+ */
+int path_target_uid(shell *shell, char *path);
+
 
 
 #endif //KIV_ZOS_PATH_LOGIC_H

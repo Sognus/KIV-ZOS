@@ -171,18 +171,18 @@ int path_exist(shell *shell, char *path)
     {
         // -1 = Kontext nesmi byt null
         return -1;
-
     }
 
     // Overeni delky cesty
     if(path == NULL || strlen(path) < 1)
     {
         // -2 = Ukazatel je NULL nebo je retezec moc kratky
-        return -2;
+        return true;
     }
 
     int path_len = strlen(path);
     //printf("PATH: %s \n", path);
+
 
     /*
      * Implementovany syntax cesty
@@ -406,7 +406,7 @@ int path_target_uid(shell *shell, char *path)
     if(path == NULL || strlen(path) < 1)
     {
         // -2 = Ukazatel je NULL nebo je retezec moc kratky
-        return -2;
+        return shell->cwd;
     }
 
     int path_len = strlen(path);

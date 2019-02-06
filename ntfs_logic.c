@@ -777,15 +777,18 @@ void get_folder_members(shell *shell, int32_t uid, int **out_array, int *out_cou
         return;
     }
 
+
     // TODO: or is symlink to folder
     if(!is_folder(shell, uid))
     {
         return;
     }
 
+
     // Zjisteni poctu UID
 
     int array_size = get_folder_members_count(shell, uid);
+
 
     // Overeni zda se neco nerozbilo
     if(array_size < 1)
@@ -800,6 +803,7 @@ void get_folder_members(shell *shell, int32_t uid, int **out_array, int *out_cou
 
     // Ziskani mft itemu
     mft_item *current_folder = find_mft_item_by_uid(shell, uid);
+
 
     // Overeni itemu
     if(current_folder == NULL)
@@ -866,6 +870,7 @@ void get_folder_members(shell *shell, int32_t uid, int **out_array, int *out_cou
 
 
     }
+
 
     // Uprava out promennych
     *out_array = array;

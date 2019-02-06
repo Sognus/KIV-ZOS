@@ -76,7 +76,9 @@ int command_ls(shell *shell)
     int *uids = NULL;
     int uid_count = -1;
 
+
     get_folder_members(shell, shell->cwd, &uids, &uid_count);
+
     for(int i = 0; i < uid_count; i++)
     {
         // TODO: symlink vypis
@@ -129,8 +131,67 @@ int command_mkdir(shell *shell, char *command)
     char *ptr = strtok(command, delim);
     ptr = strtok(NULL, delim);
 
-    create_folder(shell, ptr);
+    char *full_path = malloc(sizeof(char) * strlen(ptr));
+    strcpy(full_path, ptr);
 
+    // Posledni token
+    char * token, * last;
+    last = token = strtok(ptr, "/");
+    for (;(token = strtok(NULL, "/")) != NULL; last = token);
+
+    // Cesta bez koncove slozky
+    char *path = malloc(sizeof(char) * strlen(full_path));
+    strcpy(path, full_path);
+    path[strlen(full_path) - strlen(last)] = '\0';
+
+
+    //printf("FULL: %s\n", full_path);
+    //printf("LAST: %s\n", last);
+    //printf("CESTA: %s\n", path);
+
+    // Ulozeni aktualni slozky
+    int current_uid = shell->cwd;
+
+    if(path_exist(shell,path))
+    {
+        // Zmena na cilovou slozku
+        shell->cwd = path_target_uid(shell, path);
+        // Zjisteni zda slozka s danym jmenem existuje
+        int *uids = NULL;
+        int uid_count = -1;
+        get_folder_members(shell, shell->cwd, &uids, &uid_count);
+        int found = 0;
+        for(int i = 0; i < uid_count; i++)
+        {
+            mft_item *item = find_mft_item_by_uid(shell, uids[i]);
+            if(strcmp(item->item_name, last) == 0)
+            {
+                found = 1;
+                break;
+            }
+        }
+
+        // Pokud nebylo jmeno nalezeno, vytvor ho
+        if(found == 1)
+        {
+            printf("EXIST (nelze založit, již existuje)\n");
+        }
+        else
+        {
+            printf("OK\n");
+            create_folder(shell, last);
+        }
+
+    }
+    else
+    {
+        printf("PATH NOT FOUND (neexistuje zadaná cesta)\n");
+    }
+
+    // Navrat na aktualni slozku
+    shell->cwd = current_uid;
+
+    //create_folder(shell, ptr);
 
     return 0;
 }
